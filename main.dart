@@ -154,7 +154,7 @@ List<String> edits2(word) {
   return results;
 }
 
-List<String> candidates(word, wordsIndex) {
+List<String> candidates(String word, Map<String, int> wordsIndex) {
   List<String> candidates1 = known([word], wordsIndex);
   List<String> candidates2 = known(edits1(word), wordsIndex);
   List<String> candidates3 = known(edits2(word), wordsIndex);
@@ -200,35 +200,43 @@ String copycase(String originalword, String word) {
   }
 }
 
+List<Map> correction(String word, Map<String, int> wordsIndex,
+    {bool suggested = true}) {
+  String oword = word;
+  String lword = word.toLowerCase();
+  List<String> valid_candidates = candidates(lword, wordsIndex);
+
+  List<Map> results = [];
+
+  return results;
+}
+
 Future<void> main(List<String> args) async {
   var filePath = "corpus/corpus.txt";
   File file = File(filePath);
   var corpus = file.readAsStringSync();
   var cwords = findAllWords(corpus);
   var words_index = Counter(cwords);
-  var word = "Nakwagara";
-  var word_counts = sumList(words_index.values.toList());
-  List<String> _candidates = candidates(word, words_index);
-  print(_candidates);
+  var oword = "omunyo";
+  int word_counts = sumList(words_index.values.toList());
+  List<String> _candidates = candidates(oword, words_index);
+  Map word_probas = {};
+  for (String word in words_index.keys.toList()) {
+    word_probas[word] = (words_index[word]! / word_counts);
+  }
+
+  List<Map> suggestions = [];
+  for (String c in _candidates) {
+    suggestions.add({
+      "word": copycase(oword, c),
+      "probability": word_probas[c],
+      "out_of_vocab": false,
+      "no_sp": false,
+    });
+  }
+  // sort out the most probable
+  suggestions.sort(
+    (a, b) => b["probability"].compareTo(a["probability"]),
+  );
+  print(suggestions);
 }
-
-
-
-
-
-    // def edits1(self, word):
-    //     "All edits that are one edit away from `word`."
-    //     letters = "abcdefghijklmnopqrstuvwxyz"
-    //     splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
-    //     deletes = [L + R[1:] for L, R in splits if R]
-    //     transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R) > 1]
-    //     replaces = [L + c + R[1:] for L, R in splits if R for c in letters]
-    //     inserts = [L + c + R for L, R in splits for c in letters]
-    //     return set(deletes + transposes + replaces + inserts)
-  // final Set<String> wordTokens = {'apple', 'banana', 'cherry', 'grape'};
-  // final Set<String> stopWords = {'banana', 'grape'};
-
-  // final Set<String> filteredSet =
-  //     wordTokens.where((w) => !stopWords.contains(w)).toSet();
-
-  // print(filteredSet); // Output: {apple, cherry}

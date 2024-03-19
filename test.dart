@@ -164,17 +164,6 @@ String copycase(String originalword, String word) {
   }
 }
 
-
-
-  // def isCapitalized(self, word):
-  //       first_char = word[0]
-  //       rest_of_word = word[1 : len(word)]
-  //       if first_char.isupper() and rest_of_word.islower():
-  //           return True
-  //       else:
-  //           return False
-
-
   // def correction(self, word, suggested=True):
   //   originalword = word
   //   word = word.lower()
