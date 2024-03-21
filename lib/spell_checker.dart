@@ -1,7 +1,9 @@
 import 'dart:io';
 
 class SpellChecker {
-  var corpus, words, wordsIndex;
+  late String corpus;
+  late List<String> words;
+  late Map<String, int> wordsIndex;
   late int wordCounts;
   late String letters;
   ////////////////////
@@ -216,24 +218,54 @@ class SpellChecker {
     List<Map> suggestions = [];
     String oword = word;
     String lword = word.toLowerCase();
-    List<String> _candidates = candidates(word);
+
     Map word_probas = {};
     for (String word in this.wordsIndex.keys.toList()) {
       word_probas[word] = (this.wordsIndex[word]! / this.wordCounts);
     }
-    for (String c in _candidates) {
+    if (!this.wordsIndex.containsKey(lword)) {
+      List<String> _candidates = candidates(lword);
+      //////////
+      if (word_probas.keys.length > 0) {
+        for (String c in _candidates) {
+          if (word_probas.containsKey(c)) {
+            suggestions.add({
+              "word": copycase(oword, c),
+              "probability": word_probas[c],
+              "out_of_vocab": false,
+              "no_sp": false,
+            });
+          } else {
+            suggestions.add({
+              "word": oword,
+              "probability": 0,
+              "out_of_vocab": true,
+              "no_sp": true,
+            });
+          }
+        }
+        if (suggestions.length > 0) {
+          // sort by probability
+          suggestions.sort(
+            (a, b) => b["probability"].compareTo(a["probability"]),
+          );
+        }
+      } else {
+        suggestions.add({
+          "word": oword,
+          "probability": 0,
+          "out_of_vocab": true,
+          "no_sp": true,
+        });
+      }
+      //
+    } else {
       suggestions.add({
-        "word": copycase(oword, c),
-        "probability": word_probas[c],
+        "word": oword,
+        "probability": 1,
         "out_of_vocab": false,
         "no_sp": false,
       });
-    }
-    if (suggestions.length > 0) {
-      // sort by probability
-      suggestions.sort(
-        (a, b) => b["probability"].compareTo(a["probability"]),
-      );
     }
     return suggestions;
   }
