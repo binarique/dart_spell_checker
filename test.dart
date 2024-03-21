@@ -164,44 +164,48 @@ String copycase(String originalword, String word) {
   }
 }
 
-  // def correction(self, word, suggested=True):
-  //   originalword = word
-  //   word = word.lower()
-  //   "Most probable spelling correction for word."
-  //   valid_candidates = self.candidates(word)
-  //   if word not in self.corpus:  # no need to check spellings its already exist
-  //       word_probas = {
-  //           word: self.words[word] / self.word_counts for word in self.words.keys()
-  //       }
-  //       if word_probas:
-  //           try:
-  //               suggestions = [
-  //                   {
-  //                       "word": self.copycase(originalword, c),
-  //                       "probability": word_probas[c],
-  //                       "out_of_vocab": False,
-  //                       "no_sp": False,
-  //                   }
-  //                   for c in valid_candidates
-  //               ]
-  //           except:
-  //               suggestions = []
+  def correction(self, word, suggested=True):
+    originalword = word
+    word = word.lower()
+    "Most probable spelling correction for word."
+    if word not in self.corpus:  # no need to check spellings its already exist
+            word_probas = {
+                word: self.words[word] / self.word_counts for word in self.words.keys()
+            }
+    valid_candidates = self.candidates(word)
+    if word not in self.corpus:  # no need to check spellings its already exist
+        word_probas = {
+            word: self.words[word] / self.word_counts for word in self.words.keys()
+        }
+        if word_probas:
+            try:
+                suggestions = [
+                    {
+                        "word": self.copycase(originalword, c),
+                        "probability": word_probas[c],
+                        "out_of_vocab": False,
+                        "no_sp": False,
+                    }
+                    for c in valid_candidates
+                ]
+            except:
+                suggestions = []
 
-  //           if suggested:
-  //               sorted_suggestions = sorted(
-  //                   suggestions, key=lambda tup: tup["word"], reverse=True
-  //               )
-  //               return sorted_suggestions
-  //           else:
-  //               return self.BestCandidate(suggestions)
-  //       else:
-  //           return [
-  //               {
-  //                   "word": word,
-  //                   "probability": 0,
-  //                   "out_of_vocab": True,
-  //                   "no_sp": True,
-  //               }
-  //           ]
-  //   else:
-  //       return [{"word": word, "probability": 1, "out_of_vocab": False, "no_sp": False}]
+            if suggested:
+                sorted_suggestions = sorted(
+                    suggestions, key=lambda tup: tup["word"], reverse=True
+                )
+                return sorted_suggestions
+            else:
+                return self.BestCandidate(suggestions)
+        else:
+            return [
+                {
+                    "word": word,
+                    "probability": 0,
+                    "out_of_vocab": True,
+                    "no_sp": True,
+                }
+            ]
+    else:
+        return [{"word": word, "probability": 1, "out_of_vocab": False, "no_sp": False}]
